@@ -1,9 +1,10 @@
 import { Bot, Context, InlineKeyboard, Keyboard } from 'grammy'
 import * as settings from "./settings"
-import { addClient, login } from './api/api';
+import { addClient, login } from './api/apiXray';
 import mongoose from 'mongoose';
 import { checkUser } from './service/start-service';
-import { buyBoard, connectBoard, oneMonthBoard, startKeyBoard, treeMonthBoard } from './service/keuboard-service';
+import {connectInlineBoard, connectKeyBoard, oneMonthInlineBoard, startKeyBoard, treeMonthInlineBoard } from './service/keyboard-service';
+import { capturePayment, createPayment, getPayment } from './api/apiYoo';
 
 
 export const bot = new Bot(settings.BOT_TOKEN)
@@ -26,73 +27,69 @@ bot.api.setMyCommands([
 
 bot.command('start', async (ctx: Context) => {
     await checkUser(ctx)
-    await ctx.reply(`<b>Miracle VPN</b>  — предоставит вам доступ в Интернет без ограничений.
+    await ctx.reply(`Привет ${ctx.message?.from.first_name}!`,{
+        reply_markup:startKeyBoard
+    })
+    await ctx.reply(`<b>VPNinja</b>  — предоставит вам доступ в Интернет без ограничений.
 
 Преобретая подписку вы получаете:
 
 🚀 Высокую скорость и стабильное подключение
-
 🏴‍☠️ Доступ к любым ресурсам
-
 🥸 Полную анонимность
-
 🔐 Устойчивость к блокировкам
-
 💳 Оплата в рублях
 
-❗Вам предоставляется бесплатных 3 дня что бы опробовать VPN, нажмите <b>Подключится</b> и следуйте инструкции!
+❗Вам предоставляется бесплатных 3 дня что бы опробовать VPN, нажмите <b>🔌 Подключится</b> и следуйте инструкции!
+
+Узнай больше в разделе <b>ℹ️ Всё о сервисе</b>
 `, {
-        reply_markup: startKeyBoard,
+        reply_markup: connectInlineBoard,
         parse_mode: "HTML"
     })
-    // console.log('Context', ctx.message?.from)
 })
 
-bot.hears('Главное меню', async (ctx) => {
+bot.hears('🏠 Главное меню', async (ctx) => {
     await ctx.reply('Главное меню', {
-        reply_markup: startKeyBoard
+        reply_markup: startKeyBoard,
     })
 })
 
 bot.hears('🆘 Помощь', async (ctx) => {
-    const inlineKeyboard = new InlineKeyboard()
-        .url('Оплатить 150р', 'https://www.nu.nl/')
-        .text('Проверить оплату', 'Не оплачено')
-
     await ctx.reply('Оплатите!fdgdfgdf', {
-        reply_markup: inlineKeyboard
-    })
-
-})
-
-bot.hears('Подключиться', async (ctx) => {
-    await ctx.reply('Подключится', {
-        reply_markup: connectBoard
+        // reply_markup: inlineKeyboard
     })
 })
-bot.hears('Купить/продлить подписку', async (ctx) => {
+
+bot.hears('🔌 Подключиться', async (ctx) => {
     await ctx.reply(`Для подключения:
 
-    1.Выбери необходимый тариф
-    2.Внеси платеж
-    3.И получи ключ с простой инструкций для своего устройства 😉`,
-        {
-            reply_markup: buyBoard
-        })
-    // await addClient(ctx.from?.id as number)
+1.Выбери необходимый тариф
+2.Внеси платеж
+3.И получи ключ с простой инструкций для своего устройства 😉`, {
+        reply_markup: connectKeyBoard
+    })
 })
+
 bot.hears('1 месяц - 140р', async (ctx) => {
     await ctx.reply('Нажми на кнопку: "Оплатить", оплати 140₽   и возвращайся в бота за  VPN😉', {
-        reply_markup: oneMonthBoard
+        reply_markup: oneMonthInlineBoard
     })
-    // await addClient(ctx.from?.id as number)
 })
+
 bot.hears('3 месяца - 390р', async (ctx) => {
     await ctx.reply('Нажми на кнопку: "Оплатить", оплати 390₽   и возвращайся в бота за  VPN😉', {
-        reply_markup: treeMonthBoard
+        reply_markup: treeMonthInlineBoard
     })
-    // await addClient(ctx.from?.id as number)
 })
+
+bot.hears('Хочу впн', async (ctx) => {
+    await addClient(ctx.from?.id as number)
+    await ctx.reply('Вот ваш vpn конфиг для FoXray')
+
+})
+
+
 
 
 
@@ -102,11 +99,12 @@ async function start() {
         await mongoose.connect(settings.DB_URL).then(() => console.log('Mongoose подключен к базе данных.'))
         bot.start()
         console.log('Bot launched successfully')
+        // await getPayment()
         login()
+        
     } catch (error) {
         console.log(error);
     }
 }
-
 start()
 
