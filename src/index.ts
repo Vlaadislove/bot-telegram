@@ -1,10 +1,9 @@
 import { Bot, Context, InlineKeyboard, Keyboard } from 'grammy'
 import * as settings from "./settings"
-import { addClient, login } from './api/apiXray';
 import mongoose from 'mongoose';
 import { checkUser } from './service/start-service';
-import {connectInlineBoard, connectKeyBoard, oneMonthInlineBoard, startKeyBoard, treeMonthInlineBoard } from './service/keyboard-service';
-import { capturePayment, createPayment, getPayment } from './api/apiYoo';
+import { connectInlineBoard, connectKeyBoard, startKeyBoard } from './service/keyboard-service';
+import { paymentCreate } from './api/api';
 
 
 export const bot = new Bot(settings.BOT_TOKEN)
@@ -27,8 +26,8 @@ bot.api.setMyCommands([
 
 bot.command('start', async (ctx: Context) => {
     await checkUser(ctx)
-    await ctx.reply(`Привет ${ctx.message?.from.first_name}!`,{
-        reply_markup:startKeyBoard
+    await ctx.reply(`Привет ${ctx.message?.from.first_name}!`, {
+        reply_markup: startKeyBoard
     })
     await ctx.reply(`<b>VPNinja</b>  — предоставит вам доступ в Интернет без ограничений.
 
@@ -71,20 +70,27 @@ bot.hears('🔌 Подключиться', async (ctx) => {
     })
 })
 
+
+
 bot.hears('1 месяц - 140р', async (ctx) => {
+    const url = await paymentCreate(ctx.message?.from.id as number, 140)
+    console.log(url)
+    const oneMonthInlineBoard = new InlineKeyboard().url('💳  Оплатить 140р', `${url}`)
     await ctx.reply('Нажми на кнопку: "Оплатить", оплати 140₽   и возвращайся в бота за  VPN😉', {
         reply_markup: oneMonthInlineBoard
     })
 })
 
+
 bot.hears('3 месяца - 390р', async (ctx) => {
+    const treeMonthInlineBoard = new InlineKeyboard()
+        .url('💳  Оплатить 390р', 'https://www.testlink.com')
     await ctx.reply('Нажми на кнопку: "Оплатить", оплати 390₽   и возвращайся в бота за  VPN😉', {
         reply_markup: treeMonthInlineBoard
     })
 })
 
 bot.hears('Хочу впн', async (ctx) => {
-    await addClient(ctx.from?.id as number)
     await ctx.reply('Вот ваш vpn конфиг для FoXray')
 
 })
@@ -99,9 +105,6 @@ async function start() {
         await mongoose.connect(settings.DB_URL).then(() => console.log('Mongoose подключен к базе данных.'))
         bot.start()
         console.log('Bot launched successfully')
-        // await getPayment()
-        login()
-        
     } catch (error) {
         console.log(error);
     }

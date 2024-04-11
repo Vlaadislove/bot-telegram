@@ -15,11 +15,5 @@ export const connectKeyBoard = new Keyboard()
     .row().text('🏠 Главное меню')
     .resized()
 
-export const oneMonthInlineBoard = new InlineKeyboard()
-    .url('💳  Оплатить 140р', 'https://www.testlink.com')
-
-export const treeMonthInlineBoard = new InlineKeyboard()
-    .url('💳  Оплатить 390р', 'https://www.testlink.com')
-
 export const connectInlineBoard = new InlineKeyboard()
     .text('🔌Подключится', '🔌Подключится')

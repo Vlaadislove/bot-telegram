@@ -1,9 +1,9 @@
 import { Context } from 'grammy';
-import UserModel from '../models/user-model'
+import UserSchema from '../models/user-model'
 
 
 export const checkUser = async (ctx: Context) =>{
-    const user = await UserModel.findOne({ userId: ctx.message?.from.id })
+    const user = await UserSchema.findOne({ userId: ctx.message?.from.id })
 
     if (!user) {
         const inviteText = ctx.message?.text as string
@@ -18,7 +18,7 @@ export const checkUser = async (ctx: Context) =>{
         }
 
 
-        const user = new UserModel({
+        const user = new UserSchema({
             userId: ctx.message?.from.id,
             inviteId: invite(inviteText),
             username: ctx.message?.from.username,
