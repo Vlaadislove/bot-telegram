@@ -9,7 +9,7 @@ export const UserSchema = new mongoose.Schema(
         required: true,
       },
       inviteId: {
-        type: Number,
+        type: mongoose.Schema.Types.Mixed,
       },
       username: {
         type: String,
@@ -21,8 +21,12 @@ export const UserSchema = new mongoose.Schema(
       last_name: {
         type: String,
       },
+      useFreeSub: {
+        type:Boolean,
+        default: false
+      }
     },
     { timestamps: true, collection: "users" }
   );
 
-export default mongoose.model('Session', UserSchema)
+export default mongoose.model('Users', UserSchema)

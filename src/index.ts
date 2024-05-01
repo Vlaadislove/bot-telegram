@@ -1,9 +1,9 @@
-import { Bot, Context, InlineKeyboard, Keyboard } from 'grammy'
+import { Bot, Context, GrammyError, HttpError, InlineKeyboard, Keyboard } from 'grammy'
 import * as settings from "./settings"
 import mongoose from 'mongoose';
-import { checkUser } from './service/start-service';
+import { checkFreeSub, checkPayment, checkUser } from './service/other-service';
 import { connectInlineBoard, connectKeyBoard, startKeyBoard } from './service/keyboard-service';
-import { paymentCreate } from './api/api';
+import { paymentCreateApi } from './api/api';
 
 
 export const bot = new Bot(settings.BOT_TOKEN)
@@ -61,19 +61,57 @@ bot.hears('🆘 Помощь', async (ctx) => {
 })
 
 bot.hears('🔌 Подключиться', async (ctx) => {
-    await ctx.reply(`Для подключения:
+
+    const data = await checkFreeSub(ctx.message?.from.id as number)
+
+    if (data) {
+        await ctx.reply(`Для подключения:
 
 1.Выбери необходимый тариф
 2.Внеси платеж
 3.И получи ключ с простой инструкций для своего устройства 😉`, {
-        reply_markup: connectKeyBoard
-    })
+            reply_markup: connectKeyBoard
+        })
+    }
+    
 })
 
 
+bot.callbackQuery('🔌Подключиться', async (ctx) => {
+    const data = await checkFreeSub(ctx.update.callback_query.from.id as number)
+
+    if (data) {
+        await ctx.reply(`Для подключения:
+
+1.Выбери необходимый тариф
+2.Внеси платеж
+3.И получи ключ с простой инструкций для своего устройства 😉`, {
+            reply_markup: connectKeyBoard
+        })
+    }
+    await ctx.answerCallbackQuery()
+})
+
+bot.command('buy', async (ctx: Context) => {
+    const data = await checkFreeSub(ctx.message?.from.id as number)
+    if (data) {
+        await ctx.reply(`Для подключения:
+
+1.Выбери необходимый тариф
+2.Внеси платеж
+3.И получи ключ с простой инструкций для своего устройства 😉`, {
+            reply_markup: connectKeyBoard
+        })
+    }
+})
 
 bot.hears('1 месяц - 140р', async (ctx) => {
-    const url = await paymentCreate(ctx.message?.from.id as number, 140)
+    const payment = await checkPayment(ctx.message?.from.id as number)
+    if(!payment){
+        await ctx.reply('Нельзя создать больше 2 счетов на оплату в час!')
+        return
+    }
+    const url = await paymentCreateApi(ctx.message?.from.id as number, 140)
     console.log(url)
     const oneMonthInlineBoard = new InlineKeyboard().url('💳  Оплатить 140р', `${url}`)
     await ctx.reply('Нажми на кнопку: "Оплатить", оплати 140₽   и возвращайся в бота за  VPN😉', {
@@ -83,21 +121,30 @@ bot.hears('1 месяц - 140р', async (ctx) => {
 
 
 bot.hears('3 месяца - 390р', async (ctx) => {
-    const treeMonthInlineBoard = new InlineKeyboard()
-        .url('💳  Оплатить 390р', 'https://www.testlink.com')
+    const url = await paymentCreateApi(ctx.message?.from.id as number, 390)
+    console.log(url)
+    const oneMonthInlineBoard = new InlineKeyboard().url('💳  Оплатить 390р', `${url}`)
     await ctx.reply('Нажми на кнопку: "Оплатить", оплати 390₽   и возвращайся в бота за  VPN😉', {
-        reply_markup: treeMonthInlineBoard
+        reply_markup: oneMonthInlineBoard
     })
 })
 
-bot.hears('Хочу впн', async (ctx) => {
-    await ctx.reply('Вот ваш vpn конфиг для FoXray')
+// bot.on('message', async (ctx) => {
+//     // await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ')
+//     console.log(ctx.message.photo?.[0].file_id)
+// })
 
-})
-
-
-
-
+bot.catch((err) => {
+    const ctx = err.ctx;
+    console.error(`Error while handling update ${ctx.update.update_id}:`); const e = err.error;
+    if (e instanceof GrammyError) {
+        console.error('Error in request:', e.description);
+    } else if (e instanceof HttpError) {
+        console.error('Could not contact Telegram:', e);
+    } else {
+        console.error('Unknown error:', e);
+    }
+});
 
 
 async function start() {

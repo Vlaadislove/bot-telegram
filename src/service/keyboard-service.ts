@@ -16,4 +16,4 @@ export const connectKeyBoard = new Keyboard()
     .resized()
 
 export const connectInlineBoard = new InlineKeyboard()
-    .text('🔌Подключится', '🔌Подключится')
+    .text('🔌Подключиться', '🔌Подключиться')
