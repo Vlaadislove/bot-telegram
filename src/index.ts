@@ -129,10 +129,10 @@ bot.hears('3 месяца - 390р', async (ctx) => {
     })
 })
 
-// bot.on('message', async (ctx) => {
-//     // await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ')
-//     console.log(ctx.message.photo?.[0].file_id)
-// })
+bot.on('message', async (ctx) => {
+    await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ')
+    console.log(ctx.message.photo?.[0].file_id)
+})
 
 bot.catch((err) => {
     const ctx = err.ctx;
