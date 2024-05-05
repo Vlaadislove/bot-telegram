@@ -1,7 +1,7 @@
 import { Bot, Context, GrammyError, HttpError, InlineKeyboard, Keyboard } from 'grammy'
 import * as settings from "./settings"
 import mongoose from 'mongoose';
-import { checkFreeSub, checkPayment, checkUser } from './service/other-service';
+import { checkFreeSub, checkPayment, checkTimeSubscribe, checkUser } from './service/other-service';
 import { connectInlineBoard, connectKeyBoard, startKeyBoard } from './service/keyboard-service';
 import { paymentCreateApi } from './api/api';
 
@@ -54,6 +54,17 @@ bot.hears('🏠 Главное меню', async (ctx) => {
     })
 })
 
+bot.hears('🔔 Проверить подписку', async (ctx) => {
+    const data = await checkTimeSubscribe(ctx.message?.from.id as number)
+    if (data) {
+        await ctx.reply(`${data.message}`)
+        if (data.config) await ctx.reply(`${data.config}`)
+    } else {
+        await ctx.reply(`Что то пошло не так`)
+    }
+
+})
+
 bot.hears('🆘 Помощь', async (ctx) => {
     await ctx.reply('Оплатите!fdgdfgdf', {
         // reply_markup: inlineKeyboard
@@ -73,7 +84,6 @@ bot.hears('🔌 Подключиться', async (ctx) => {
             reply_markup: connectKeyBoard
         })
     }
-    
 })
 
 
@@ -107,7 +117,7 @@ bot.command('buy', async (ctx: Context) => {
 
 bot.hears('1 месяц - 140р', async (ctx) => {
     const payment = await checkPayment(ctx.message?.from.id as number)
-    if(!payment){
+    if (!payment) {
         await ctx.reply('Нельзя создать больше 2 счетов на оплату в час!')
         return
     }
@@ -129,10 +139,10 @@ bot.hears('3 месяца - 390р', async (ctx) => {
     })
 })
 
-bot.on('message', async (ctx) => {
-    await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ')
-    console.log(ctx.message.photo?.[0].file_id)
-})
+// bot.on('message', async (ctx) => {
+//     await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ')
+//     console.log(ctx.message.photo?.[0].file_id)
+// })
 
 bot.catch((err) => {
     const ctx = err.ctx;
