@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@a2seven/yoo-checkout": "^1.1.4",
+    "@grammyjs/hydrate": "github:grammyjs/hydrate",
     "axios": "^1.6.8",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

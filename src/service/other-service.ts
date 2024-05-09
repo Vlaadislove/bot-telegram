@@ -33,7 +33,6 @@ export const checkUser = async (ctx: Context) => {
     }
 }
 
-
 export const checkFreeSub = async (userId: number) => {
 
     const user = await UserSchema.findOne({ userId })
@@ -57,13 +56,13 @@ export const checkTimeSubscribe = async (userId: number) => {
         const subscription = await SubscriptionSchema.findOne({ userId, statusSub: true })
 
         if (subscription) {
-           const message =  differenceTime(subscription.subExpire)
-           return {config:subscription.config, message}
+            const message = differenceTime(subscription.subExpire)
+            return { config: subscription.config, message }
         } else if (subscriptionFree) {
             const message = differenceTime(subscriptionFree.subExpire)
-            return {config:subscriptionFree.config, message}
+            return { config: subscriptionFree.config, message }
         } else {
-           return {message: 'Подписка не найдена!'}
+            return { message: 'Подписка не найдена!' }
         }
     } catch (error) {
         console.log(error)
@@ -83,9 +82,29 @@ const differenceTime = (expireDate: Date) => {
     if (difference < 3600000) {
         return "Подписка закончится в течение часа!"
     } else {
-        return `Подписка закончится через: ${daysString} и ${hoursString}`
+        return `Подписка закончится через: <b>${daysString}</b> и <b>${hoursString}</b>`
     }
 }
+
+export const getConfig = async (userId: number) => {
+    const subscriptionFree = await SubscriptionFreeSchema.findOne({ userId, statusSub: true })
+    const subscription = await SubscriptionSchema.findOne({ userId, statusSub: true })
+
+    if (subscriptionFree) return subscriptionFree.config
+    else if (subscription) {
+        return subscription.config
+    }
+}
+
+export const getSubscription = async (userId: number) => {
+    const subscriptionFree = await SubscriptionFreeSchema.findOne({ userId, statusSub: true })
+    const subscription = await SubscriptionSchema.findOne({ userId, statusSub: true })
+
+    if (subscriptionFree || subscription) return true
+    else return false
+
+}
+
 
 const pluralize = (number: number, forms: string[]) => {
     let formIndex;
@@ -98,3 +117,11 @@ const pluralize = (number: number, forms: string[]) => {
     }
     return forms[formIndex];
 };
+
+export function simulateAsyncOperation(ms: number) {
+    return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+            resolve("Результат асинхронной операции");
+        }, ms);
+    });
+}

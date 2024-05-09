@@ -1,12 +1,14 @@
+
 import { Bot, Context, GrammyError, HttpError, InlineKeyboard, Keyboard } from 'grammy'
+import { hydrate, HydrateFlavor } from '@grammyjs/hydrate';
 import * as settings from "./settings"
 import mongoose from 'mongoose';
-import { checkFreeSub, checkPayment, checkTimeSubscribe, checkUser } from './service/other-service';
-import { connectInlineBoard, connectKeyBoard, startKeyBoard } from './service/keyboard-service';
-import { paymentCreateApi } from './api/api';
+import { callbackQueryConnect, commandBuy, commandStart, hearsAboutService, hearsAndroid, hearsCheckSubscription, hearsCreatePay, hearsHelp, hearsInstructions, hearsInviteFriend, hearsIphone, hearsMainMenu } from './service/command-service';
+import { getConfig } from './service/other-service';
 
-
-export const bot = new Bot(settings.BOT_TOKEN)
+type MyContext = HydrateFlavor<Context>
+export const bot = new Bot<MyContext>(settings.BOT_TOKEN)
+bot.use(hydrate())
 
 bot.api.setMyCommands([
     {
@@ -23,126 +25,139 @@ bot.api.setMyCommands([
     },
 ])
 
-
 bot.command('start', async (ctx: Context) => {
-    await checkUser(ctx)
-    await ctx.reply(`Привет ${ctx.message?.from.first_name}!`, {
-        reply_markup: startKeyBoard
-    })
-    await ctx.reply(`<b>VPNinja</b>  — предоставит вам доступ в Интернет без ограничений.
-
-Преобретая подписку вы получаете:
-
-🚀 Высокую скорость и стабильное подключение
-🏴‍☠️ Доступ к любым ресурсам
-🥸 Полную анонимность
-🔐 Устойчивость к блокировкам
-💳 Оплата в рублях
-
-❗Вам предоставляется бесплатных 3 дня что бы опробовать VPN, нажмите <b>🔌 Подключится</b> и следуйте инструкции!
-
-Узнай больше в разделе <b>ℹ️ Всё о сервисе</b>
-`, {
-        reply_markup: connectInlineBoard,
-        parse_mode: "HTML"
-    })
+    await commandStart(ctx)
+})
+bot.command('buy', async (ctx: Context) => {
+    await commandBuy(ctx)
 })
 
+
 bot.hears('🏠 Главное меню', async (ctx) => {
-    await ctx.reply('Главное меню', {
-        reply_markup: startKeyBoard,
-    })
+    await hearsMainMenu(ctx)
 })
 
 bot.hears('🔔 Проверить подписку', async (ctx) => {
-    const data = await checkTimeSubscribe(ctx.message?.from.id as number)
-    if (data) {
-        await ctx.reply(`${data.message}`)
-        if (data.config) await ctx.reply(`${data.config}`)
-    } else {
-        await ctx.reply(`Что то пошло не так`)
-    }
-
+    await hearsCheckSubscription(ctx)
 })
 
 bot.hears('🆘 Помощь', async (ctx) => {
-    await ctx.reply('Оплатите!fdgdfgdf', {
-        // reply_markup: inlineKeyboard
-    })
+    await hearsHelp(ctx)
+})
+bot.hears('🎁 Пригласить друга', async (ctx) => {
+    await hearsInviteFriend(ctx)
+})
+bot.hears('ℹ️ Всё о сервисе', async (ctx) => {
+    await hearsAboutService(ctx)
+})
+bot.hears('🗂 Инструкция', async (ctx) => {
+    await hearsInstructions(ctx)
 })
 
 bot.hears('🔌 Подключиться', async (ctx) => {
-
-    const data = await checkFreeSub(ctx.message?.from.id as number)
-
-    if (data) {
-        await ctx.reply(`Для подключения:
-
-1.Выбери необходимый тариф
-2.Внеси платеж
-3.И получи ключ с простой инструкций для своего устройства 😉`, {
-            reply_markup: connectKeyBoard
-        })
-    }
-})
-
-
-bot.callbackQuery('🔌Подключиться', async (ctx) => {
-    const data = await checkFreeSub(ctx.update.callback_query.from.id as number)
-
-    if (data) {
-        await ctx.reply(`Для подключения:
-
-1.Выбери необходимый тариф
-2.Внеси платеж
-3.И получи ключ с простой инструкций для своего устройства 😉`, {
-            reply_markup: connectKeyBoard
-        })
-    }
-    await ctx.answerCallbackQuery()
-})
-
-bot.command('buy', async (ctx: Context) => {
-    const data = await checkFreeSub(ctx.message?.from.id as number)
-    if (data) {
-        await ctx.reply(`Для подключения:
-
-1.Выбери необходимый тариф
-2.Внеси платеж
-3.И получи ключ с простой инструкций для своего устройства 😉`, {
-            reply_markup: connectKeyBoard
-        })
-    }
+    await commandBuy(ctx)
 })
 
 bot.hears('1 месяц - 140р', async (ctx) => {
-    const payment = await checkPayment(ctx.message?.from.id as number)
-    if (!payment) {
-        await ctx.reply('Нельзя создать больше 2 счетов на оплату в час!')
-        return
-    }
-    const url = await paymentCreateApi(ctx.message?.from.id as number, 140)
-    console.log(url)
-    const oneMonthInlineBoard = new InlineKeyboard().url('💳  Оплатить 140р', `${url}`)
-    await ctx.reply('Нажми на кнопку: "Оплатить", оплати 140₽   и возвращайся в бота за  VPN😉', {
-        reply_markup: oneMonthInlineBoard
-    })
+    await hearsCreatePay(ctx, 140)
 })
-
 
 bot.hears('3 месяца - 390р', async (ctx) => {
-    const url = await paymentCreateApi(ctx.message?.from.id as number, 390)
-    console.log(url)
-    const oneMonthInlineBoard = new InlineKeyboard().url('💳  Оплатить 390р', `${url}`)
-    await ctx.reply('Нажми на кнопку: "Оплатить", оплати 390₽   и возвращайся в бота за  VPN😉', {
-        reply_markup: oneMonthInlineBoard
-    })
+    await hearsCreatePay(ctx, 390)
+})
+bot.hears('📱IOS', async (ctx) => {
+    await hearsIphone(ctx)
+})
+bot.hears('🤖Android', async (ctx) => {
+    await hearsAndroid(ctx)
 })
 
-// bot.on('message', async (ctx) => {
-//     await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ')
-//     console.log(ctx.message.photo?.[0].file_id)
+
+bot.callbackQuery('connect', async (ctx) => {
+    await callbackQueryConnect(ctx)
+})
+
+bot.callbackQuery('instructions', async (ctx) => {
+    const deviseKeyboard = new InlineKeyboard().text('📱IOS', 'instructions-iphone').text('🤖Android', 'instructions-android')
+    await ctx.callbackQuery.message?.editText('Выберите для какого устройства вы хотите настроить VPN?', {
+        reply_markup: deviseKeyboard
+    })
+    await ctx.answerCallbackQuery()
+})
+bot.callbackQuery('instructions-iphone', async (ctx) => {
+    const deviseKeyboard = new InlineKeyboard().text('📹 Посмотреть видео инструкцию', 'video-iphone')
+    await ctx.callbackQuery.message?.editText('Шаг 1. Скопируйте через долгое нажатие или просто нажмите на сообщение выше 👆')
+    await ctx.reply('Шаг 2. Установите приложение FoXray из AppStore 👉 https://apps.apple.com/ru/app/foxray/id6448898396', {
+        parse_mode: 'HTML',
+        link_preview_options: { is_disabled: true }
+    })
+    await ctx.reply('Шаг 3. Откройте приложение и нажмите на иконку 📋и разрешите вставку из приложения Telegram')
+    await ctx.reply('Шаг 4. Нажмите на ▷ напротив появившегося тунеля для VPN')
+    await ctx.reply('🎉VPN настроен и готов к использованию. Спасибо что выбрали <b>VPNinja</b> ❤️', {
+        parse_mode: 'HTML'
+    })
+    await ctx.reply('Еще проще после прочтения посмотреть <b><u>ВИДЕО</u></b> интсрукцию по настройкеVPN', {
+        reply_markup: deviseKeyboard,
+        parse_mode: 'HTML'
+    })
+    await ctx.answerCallbackQuery()
+})
+bot.callbackQuery('instructions-android', async (ctx) => {
+    // const deviseKeyboard = new InlineKeyboard().text('Посмотреть видео инструкцию', 'video-android')
+    await ctx.callbackQuery.message?.editText('Шаг 1. Скопируйте через долгое нажатие или просто нажмите на сообщение выше 👆')
+    await ctx.reply(`
+    Шаг 2. Установи приложение v2rayNG из GooglePlay https://play.google.com/store/apps/details?id=com.v2ray.ang
+
+<i>Если у тебя нет Google Play Store на телефоне, то напиши мне @vlad_is_loovee</i>
+    `, {
+        parse_mode: 'HTML',
+        link_preview_options: { is_disabled: true }
+    })
+    await ctx.reply('Шаг 3. Открой установленное приложение, нажми на ➕ в верхней части экрана и выбери "Импорт профиля из буфера обмена')
+    await ctx.reply('Шаг 4. Нажми на импортированный туннель, а затем на кнопку ☑ в нижнем правом углу')
+    await ctx.reply('🎉VPN настроен и готов к использованию. Спасибо что выбрали <b>VPNinja</b> ❤️', {
+        parse_mode: 'HTML'
+    })
+    await ctx.answerCallbackQuery()
+    // await ctx.reply('Еще проще после прочтения посмотреть ВИДЕО интсрукцию по включению VPN', {
+    //     reply_markup: deviseKeyboard
+    // })
+})
+bot.callbackQuery('video-iphone', async (ctx) => {
+    await ctx.deleteMessage()
+    await ctx.replyWithVideo('BAACAgIAAxkBAAIW8mY757iZUjhk4klzIrghQ_FXQ3z-AAKzTQACmt7gSa3vctwskkuKNQQ')
+    await ctx.answerCallbackQuery()
+})
+bot.callbackQuery('open-config', async (ctx) => {
+    const oneMonthInlineBoard = new InlineKeyboard().text('🗂 Инструкция', `instructions`)
+    const config = await getConfig(ctx.update.callback_query?.from.id as number)
+    if (config) {
+        await ctx.deleteMessage()
+        await ctx.reply(`<code>${config}</code>`, {
+            parse_mode: 'HTML'
+        })
+        await ctx.reply('Это ваш конфиг ⬆ для VPN, скопируйте его(через долгое нажатие или просто нажмите на сообщение)  и нажмите на кнопку 🗂<b>Инструкция</b>, выберите ваше устройство и подключайтесь к нам!', {
+            reply_markup: oneMonthInlineBoard,
+            parse_mode: 'HTML'
+        })
+    } else {
+        await ctx.deleteMessage()
+        await ctx.reply('Конфиг не найден!')
+    }
+
+    await ctx.answerCallbackQuery()
+})
+// bot.callbackQuery('video-android', async (ctx) => {
+//     await ctx.deleteMessage()
+//     await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ') // тут будет видео
 // })
+
+
+// bot.on('message', async (ctx) => {
+// // await ctx.replyWithVideo('BAACAgIAAxkBAAIW8mY757iZUjhk4klzIrghQ_FXQ3z-AAKzTQACmt7gSa3vctwskkuKNQQ')
+// console.log(ctx.message)
+// })
+
 
 bot.catch((err) => {
     const ctx = err.ctx;
