@@ -237,6 +237,7 @@ export const callbackQueryConnect = async (ctx: Context) => {
 //     })
 //     await ctx.answerCallbackQuery()
 // }
+// }
 // export const callbackQueryInstructionsIphone = async (ctx: Context) => {
 //     const deviseKeyboard = new InlineKeyboard().text('📹 Посмотреть видео инструкцию', 'video-iphone')
 //     await ctx.callbackQuery.message?.editText('Шаг 1. Скопируйте через долгое нажатие или просто нажмите на сообщение выше 👆')

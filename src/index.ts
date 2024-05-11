@@ -31,6 +31,9 @@ bot.command('start', async (ctx: Context) => {
 bot.command('buy', async (ctx: Context) => {
     await commandBuy(ctx)
 })
+bot.command('help', async (ctx: Context) => {
+    await hearsHelp(ctx)
+})
 
 
 bot.hears('🏠 Главное меню', async (ctx) => {
