@@ -9,7 +9,7 @@ export const commandStart = async (ctx: Context) => {
     await ctx.reply(`Привет ${ctx.message?.from.first_name}!`, {
         reply_markup: startKeyBoard
     })
-    await ctx.reply(`<b>VPNinja</b>  — предоставит вам доступ в Интернет без ограничений.
+    await ctx.reply(`<b>🥷 VPNinja</b>  — предоставит вам доступ в Интернет без ограничений.
 
 <i>Преобретая подписку вы получаете:</i>
 

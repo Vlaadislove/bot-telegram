@@ -3,7 +3,9 @@ import { Bot, Context, GrammyError, HttpError, InlineKeyboard, Keyboard } from '
 import { hydrate, HydrateFlavor } from '@grammyjs/hydrate';
 import * as settings from "./settings"
 import mongoose from 'mongoose';
-import { callbackQueryConnect, commandBuy, commandStart, hearsAboutService, hearsAndroid, hearsCheckSubscription, hearsCreatePay, hearsHelp, hearsInstructions, hearsInviteFriend, hearsIphone, hearsMainMenu } from './service/command-service';
+import { callbackQueryConnect, commandBuy, commandStart,
+ hearsAboutService, hearsAndroid, hearsCheckSubscription, hearsCreatePay, hearsHelp,
+ hearsInstructions, hearsInviteFriend, hearsIphone, hearsMainMenu } from './service/command-service';
 import { getConfig } from './service/other-service';
 
 type MyContext = HydrateFlavor<Context>
