@@ -62,7 +62,7 @@ export const checkTimeSubscribe = async (userId: number) => {
             const message = differenceTime(subscriptionFree.subExpire)
             return { config: subscriptionFree.config, message }
         } else {
-            return { message: 'Подписка не найдена!' }
+            return { message: 'Подписка не найдена! 🙁' }
         }
     } catch (error) {
         console.log(error)
