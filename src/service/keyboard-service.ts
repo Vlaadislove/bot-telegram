@@ -1,7 +1,7 @@
 import { InlineKeyboard, Keyboard } from "grammy";
 
 export const startKeyBoard = new Keyboard()
-    .text('🔌 Подключиться').row()
+    .text('🔌 Подключиться / Оплатить').row()
     .text('🔔 Проверить подписку')
     .row().text('🗂 Инструкция')
     .text('ℹ️ Всё о сервисе')
@@ -16,4 +16,4 @@ export const connectKeyBoard = new Keyboard()
     .resized()
 
 export const connectInlineBoard = new InlineKeyboard()
-    .text('🔌Подключиться', 'connect')
+    .text('🔌Подключиться  / Оплатить', 'connect')

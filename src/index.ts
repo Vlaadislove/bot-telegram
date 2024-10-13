@@ -1,14 +1,17 @@
-
 import { Bot, Context, GrammyError, HttpError, InlineKeyboard, Keyboard } from 'grammy'
 import { hydrate, HydrateFlavor } from '@grammyjs/hydrate';
 import * as settings from "./settings"
 import mongoose from 'mongoose';
-import { callbackQueryConnect, commandBuy, commandStart,
- hearsAboutService, hearsAndroid, hearsCheckSubscription, hearsCreatePay, hearsHelp,
- hearsInstructions, hearsInviteFriend, hearsIphone, hearsMainMenu } from './service/command-service';
-import { getConfig } from './service/other-service';
+import {
+    callbackQueryConnect, commandBuy, commandStart,
+    hearsAboutService, hearsAndroid, hearsCheckSubscription, hearsCreatePay, hearsHelp,
+    hearsInstructions, hearsInviteFriend, hearsIphone, hearsMacOC, hearsMainMenu,
+    hearsWindows
+} from './service/command-service';
+import { instructionsAndroidCQ, instructionsCQ, instructionsIphoneCQ, instructionsMacOcCQ, instructionsWindowsCQ, openConfigCQ, videoIphoneCQ, videoIWindowsCQ } from './service/callbackQuery-service';
 
-type MyContext = HydrateFlavor<Context>
+
+export type MyContext = HydrateFlavor<Context>
 export const bot = new Bot<MyContext>(settings.BOT_TOKEN)
 bot.use(hydrate())
 
@@ -37,7 +40,6 @@ bot.command('help', async (ctx: Context) => {
     await hearsHelp(ctx)
 })
 
-
 bot.hears('🏠 Главное меню', async (ctx) => {
     await hearsMainMenu(ctx)
 })
@@ -59,7 +61,7 @@ bot.hears('🗂 Инструкция', async (ctx) => {
     await hearsInstructions(ctx)
 })
 
-bot.hears('🔌 Подключиться', async (ctx) => {
+bot.hears('🔌 Подключиться / Оплатить', async (ctx) => {
     await commandBuy(ctx)
 })
 
@@ -73,96 +75,88 @@ bot.hears('3 месяца - 390р', async (ctx) => {
 bot.hears('📱IOS', async (ctx) => {
     await hearsIphone(ctx)
 })
-bot.hears('🤖Android', async (ctx) => {
+bot.hears('🤖 Android', async (ctx) => {
     await hearsAndroid(ctx)
+})
+bot.hears('🖥 Windows', async (ctx) => {
+    await hearsWindows(ctx)
+})
+bot.hears('💻 MacOS', async (ctx) => {
+    await hearsMacOC(ctx)
 })
 
 
+//callbackQury
 bot.callbackQuery('connect', async (ctx) => {
     await callbackQueryConnect(ctx)
 })
 
 bot.callbackQuery('instructions', async (ctx) => {
-    const deviseKeyboard = new InlineKeyboard().text('📱IOS', 'instructions-iphone').text('🤖Android', 'instructions-android')
-    await ctx.callbackQuery.message?.editText('Выберите для какого устройства вы хотите настроить VPN?', {
-        reply_markup: deviseKeyboard
-    })
-    await ctx.answerCallbackQuery()
+    await instructionsCQ(ctx)
 })
 bot.callbackQuery('instructions-iphone', async (ctx) => {
-    const deviseKeyboard = new InlineKeyboard().text('📹 Посмотреть видео инструкцию', 'video-iphone')
-    await ctx.callbackQuery.message?.editText('Шаг 1. Скопируйте через долгое нажатие или просто нажмите на сообщение выше 👆')
-    await ctx.reply('Шаг 2. Установите приложение FoXray из AppStore 👉 https://apps.apple.com/ru/app/foxray/id6448898396', {
-        parse_mode: 'HTML',
-        link_preview_options: { is_disabled: true }
-    })
-    await ctx.reply('Шаг 3. Откройте приложение и нажмите на иконку 📋и разрешите вставку из приложения Telegram')
-    await ctx.reply('Шаг 4. Нажмите на ▷ напротив появившегося тунеля для VPN')
-    await ctx.reply('🎉VPN настроен и готов к использованию. Спасибо что выбрали <b>VPNinja</b> ❤️', {
-        parse_mode: 'HTML'
-    })
-    await ctx.reply('Еще проще после прочтения посмотреть <b><u>ВИДЕО</u></b> интсрукцию по настройкеVPN', {
-        reply_markup: deviseKeyboard,
-        parse_mode: 'HTML'
-    })
-    await ctx.answerCallbackQuery()
+    await instructionsIphoneCQ(ctx)
 })
-bot.callbackQuery('instructions-android', async (ctx) => {
-    // const deviseKeyboard = new InlineKeyboard().text('Посмотреть видео инструкцию', 'video-android')
-    await ctx.callbackQuery.message?.editText('Шаг 1. Скопируйте через долгое нажатие или просто нажмите на сообщение выше 👆')
-    await ctx.reply(`
-    Шаг 2. Установи приложение v2rayNG из GooglePlay https://play.google.com/store/apps/details?id=com.v2ray.ang
 
-<i>Если у тебя нет Google Play Store на телефоне, то напиши мне @vlad_is_loovee</i>
-    `, {
-        parse_mode: 'HTML',
-        link_preview_options: { is_disabled: true }
-    })
-    await ctx.reply('Шаг 3. Открой установленное приложение, нажми на ➕ в верхней части экрана и выбери "Импорт профиля из буфера обмена')
-    await ctx.reply('Шаг 4. Нажми на импортированный туннель, а затем на кнопку ☑ в нижнем правом углу')
-    await ctx.reply('🎉VPN настроен и готов к использованию. Спасибо что выбрали <b>VPNinja</b> ❤️', {
-        parse_mode: 'HTML'
-    })
-    await ctx.answerCallbackQuery()
-    // await ctx.reply('Еще проще после прочтения посмотреть ВИДЕО интсрукцию по включению VPN', {
-    //     reply_markup: deviseKeyboard
-    // })
+bot.callbackQuery('instructions-windows', async (ctx) => {
+    await instructionsWindowsCQ(ctx)
+})
+bot.callbackQuery('instructions-macOC', async (ctx) => {
+    await instructionsMacOcCQ(ctx)
+})
+
+bot.callbackQuery('instructions-android', async (ctx) => {
+    await instructionsAndroidCQ(ctx)
+})
+
+bot.callbackQuery('open-config', async (ctx) => {
+    await openConfigCQ(ctx)
 })
 bot.callbackQuery('video-iphone', async (ctx) => {
-    await ctx.deleteMessage()
-    await ctx.replyWithVideo('BAACAgIAAxkBAAIW8mY757iZUjhk4klzIrghQ_FXQ3z-AAKzTQACmt7gSa3vctwskkuKNQQ')
-    await ctx.answerCallbackQuery()
+    await videoIphoneCQ(ctx)
 })
-bot.callbackQuery('open-config', async (ctx) => {
-    const oneMonthInlineBoard = new InlineKeyboard().text('🗂 Инструкция', `instructions`)
-    const config = await getConfig(ctx.update.callback_query?.from.id as number)
-    if (config) {
-        await ctx.deleteMessage()
-        await ctx.reply(`<code>${config}</code>`, {
-            parse_mode: 'HTML'
-        })
-        await ctx.reply('Это ваш конфиг ⬆ для VPN, скопируйте его(через долгое нажатие или просто нажмите на сообщение)  и нажмите на кнопку 🗂<b>Инструкция</b>, выберите ваше устройство и подключайтесь к нам!', {
-            reply_markup: oneMonthInlineBoard,
-            parse_mode: 'HTML'
-        })
-    } else {
-        await ctx.deleteMessage()
-        await ctx.reply('Конфиг не найден!')
-    }
 
-    await ctx.answerCallbackQuery()
+bot.callbackQuery('video-windows', async (ctx) => {
+    await videoIWindowsCQ(ctx)
 })
 // bot.callbackQuery('video-android', async (ctx) => {
-//     await ctx.deleteMessage()
-//     await ctx.replyWithPhoto('AgACAgIAAxkBAAINmmYn5IpYoHE42RlkVJme3cS2_mwTAALW3jEb7jhASZc0brbm5AGiAQADAgADcwADNAQ') // тут будет видео
+
 // })
 
+bot.on('message:media', async (ctx) => {
+    if (ctx.from.id === settings.ADMIN_ID) {
+        if (ctx.message && ctx.message.photo && ctx.message.photo[0]) {
+            console.log('photo', ctx.message.photo[0].file_id)
+            await ctx.reply(`photo: ${ctx.message.photo[0].file_id}`)
+        } else if (ctx.message.video?.file_id) {
+            console.log('video', ctx.message.video.file_id)
+            await ctx.reply(`video: ${ctx.message.video.file_id}`)
+        }
+    } else {
 
-// bot.on('message', async (ctx) => {
-// // await ctx.replyWithVideo('BAACAgIAAxkBAAIW8mY757iZUjhk4klzIrghQ_FXQ3z-AAKzTQACmt7gSa3vctwskkuKNQQ')
-// console.log(ctx.message)
-// })
+        await ctx.reply('Кажется, я не знаю эту команду. Введите /start, чтобы попасть в главное меню.')
+        bot.api.sendMessage(settings.ADMIN_ID, `
+Message from user: Попытка отправить видео или фото
 
+ID: ${ctx.from.id},
+First_name: ${ctx.from.first_name},
+Last_name: ${ctx.from.last_name},
+Username: @${ctx.from.username},
+`)
+    }
+})
+
+bot.on('message', async (ctx) => {
+    await ctx.reply('Кажется, я не знаю эту команду. Введите /start, чтобы попасть в главное меню.')
+    bot.api.sendMessage(settings.ADMIN_ID, `
+Message from user: ${ctx.message.text}
+
+ID: ${ctx.from.id},
+First_name: ${ctx.from.first_name},
+Last_name: ${ctx.from.last_name},
+Username: @${ctx.from.username},
+`)
+})
 
 bot.catch((err) => {
     const ctx = err.ctx;

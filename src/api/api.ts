@@ -1,13 +1,12 @@
 import axios from "axios"
-
+import * as settings from "../settings"
 
 export const paymentCreateApi = async (userId: number, price: number) => {
     try {
-        const response = await axios.post('http://localhost:3000/payment/create', {
+        const response = await axios.post(`http://${settings.SERVER_URL}/payment/create-payment`, {
             userId,
             price
         })
-        // console.log('response', response.data)
         return response.data.url
     } catch (error) {
         console.log(error)
@@ -17,9 +16,8 @@ export const paymentCreateApi = async (userId: number, price: number) => {
 
 
 export const createFreeSubApi = async (userId: number) => {
-
     try {
-        const response = await axios.post(`http://localhost:3000/payment/free-subscription`, {
+        const response = await axios.post(`http://${settings.SERVER_URL}/payment/free-subscription`, {
             userId
         })
         return response.data

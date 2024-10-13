@@ -4,11 +4,11 @@ import { Context } from 'grammy';
 import UserSchema from '../models/user-model'
 import { createFreeSubApi } from '../api/api';
 import SubscriptionSchema from '../models/subscription-model';
-
+import * as settings from '../settings'
+import { bot } from '../index'
 
 export const checkUser = async (ctx: Context) => {
     const user = await UserSchema.findOne({ userId: ctx.message?.from.id })
-
     if (!user) {
         const inviteText = ctx.message?.text as string
 
@@ -30,6 +30,15 @@ export const checkUser = async (ctx: Context) => {
             last_name: ctx.message?.from.last_name
         })
         await user.save()
+
+        bot.api.sendMessage(settings.ADMIN_ID, `
+Новый пользователь!
+            
+ID: ${ctx.from?.id},
+First_name: ${ctx.from?.first_name},
+Last_name: ${ctx.from?.last_name ? ctx.from?.last_name : 'Last name name not found'},
+Username: ${ctx.from?.username ? "@" + ctx.from?.username : 'User name not found'},
+Is premium: ${ctx.from?.is_premium ? 'True' : 'False'}`)
     }
 }
 
