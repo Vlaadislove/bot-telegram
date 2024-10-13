@@ -1,20 +1,13 @@
-# Используем Node.js как базовый образ
-FROM node:18
+FROM node:18-alpine
 
-# Устанавливаем рабочую директорию внутри контейнера
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Копируем package.json и package-lock.json
 COPY package*.json ./
 
-# Устанавливаем зависимости
 RUN npm install
 
-# Копируем весь код приложения
 COPY . .
 
-# Открываем порт, который слушает ваше приложение (например, 3000)
-EXPOSE 3000
+RUN npm run build
 
-# Запускаем приложение
-CMD ["node", "index.js"]
+CMD ["node", "./dist/index.js"]
