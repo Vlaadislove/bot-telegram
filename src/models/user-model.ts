@@ -2,7 +2,7 @@ import mongoose, { Model, Document, Types } from "mongoose";
 
 
 
-export const UserSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
     {
         userId: {
             type: Number,

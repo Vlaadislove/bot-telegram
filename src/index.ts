@@ -171,6 +171,7 @@ bot.catch((err) => {
 });
 
 
+
 async function start() {
     try {
         await mongoose.connect(settings.DB_URL).then(() => console.log('Mongoose подключен к базе данных.'))
