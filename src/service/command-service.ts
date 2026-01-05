@@ -1,6 +1,6 @@
 import { Context, InlineKeyboard, Keyboard } from "grammy"
 import { connectInlineBoard, connectKeyBoard, startKeyBoard } from "./keyboard-service"
-import { checkFreeSub, checkPayment, checkTimeSubscribe, checkUser, getConfig, getSubscription, simulateAsyncOperation } from "./other-service"
+import { checkFreeSub, checkPayment, checkTimeSubscribe, checkUser, getConfig, getSubscription, simulateAsyncOperation, syncUserProfile } from "./other-service"
 import { paymentCreateApi } from "../api/api"
 import * as settings from "../settings"
 
@@ -75,6 +75,7 @@ export const hearsCreatePay = async (ctx: Context, price: number) => {
     await ctx.reply('Нельзя создать больше 2 счетов на оплату в час!')
     return
   }
+  await syncUserProfile(ctx);
   const url = await paymentCreateApi(ctx.message?.from.id as number, price)
   const oneMonthInlineBoard = new InlineKeyboard().url(`💳  Оплатить ${price}р`, `${url}`)
   const mainMenuKeyboard = new Keyboard().text('🏠 Главное меню').resized()
@@ -84,8 +85,8 @@ export const hearsCreatePay = async (ctx: Context, price: number) => {
   await ctx.reply(`Нажми на кнопку: "Оплатить", оплати ${price}₽   и возвращайся в бота за  VPN😉`, {
     reply_markup: oneMonthInlineBoard
   })
-
 }
+
 export const hearsHelp = async (ctx: Context) => {
   await ctx.reply(`С предложениями об улучшении функционала и по другим вопросам, пишите нам в поддержку ${settings.SUPPORT_NAME}`)
 }

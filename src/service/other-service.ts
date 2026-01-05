@@ -134,3 +134,20 @@ export function simulateAsyncOperation(ms: number) {
         }, ms);
     });
 }
+
+
+export const syncUserProfile = async (ctx: Context) => {
+  if (!ctx.from) return;
+  const { id, first_name, last_name, username } = ctx.from;
+  await UserSchema.findOneAndUpdate(
+    { userId: id },
+    {
+      $set: {
+        first_name: first_name ?? '',
+        last_name: last_name ?? '',
+        username: username ?? '',
+      },
+    },
+    { upsert: true }
+  );
+};
