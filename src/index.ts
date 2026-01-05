@@ -65,13 +65,14 @@ bot.hears('🔌 Подключиться / Оплатить', async (ctx) => {
     await commandBuy(ctx)
 })
 
-bot.hears('1 месяц - 140р', async (ctx) => {
-    await hearsCreatePay(ctx, 140)
+bot.hears('1 месяц - 170р', async (ctx) => {
+    await hearsCreatePay(ctx, 170)
 })
 
-bot.hears('3 месяца - 390р', async (ctx) => {
-    await hearsCreatePay(ctx, 390)
+bot.hears('3 месяца - 480р', async (ctx) => {
+    await hearsCreatePay(ctx, 480)
 })
+
 bot.hears('📱IOS', async (ctx) => {
     await hearsIphone(ctx)
 })

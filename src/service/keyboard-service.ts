@@ -10,8 +10,8 @@ export const startKeyBoard = new Keyboard()
     .resized()
 
 export const connectKeyBoard = new Keyboard()
-    .text('1 месяц - 140р')
-    .text('3 месяца - 390р')
+    .text('1 месяц - 170р')
+    .text('3 месяца - 480р')
     .row().text('🏠 Главное меню')
     .resized()
 
