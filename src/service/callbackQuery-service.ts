@@ -47,7 +47,7 @@ export const instructionsAndroidCQ = async (ctx: MyContext) => {
         parse_mode:"HTML"
     })
     await ctx.reply(`
-<b>Шаг 2.</b> Установи приложение v2rayNG из GooglePlay https://play.google.com/store/apps/details?id=com.v2ray.ang
+<b>Шаг 2.</b> Установи приложение v2ray из GooglePlay https://play.google.com/store/apps/details?id=com.v2raytun.android
 
 <i>Если у тебя нет Google Play Store на телефоне, то напиши мне ${settings.SUPPORT_NAME}</i>
 `, {

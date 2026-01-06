@@ -197,7 +197,7 @@ export const hearsAndroid = async (ctx: Context) => {
       parse_mode: 'HTML'
     })
     await ctx.reply(`
-    <b>Шаг 2.</b> Установи приложение v2rayNG из GooglePlay https://play.google.com/store/apps/details?id=com.v2ray.ang
+    <b>Шаг 2.</b> Установи приложение v2ray из GooglePlay https://play.google.com/store/apps/details?id=com.v2raytun.android
 
 <i>Если у тебя нет Google Play Store на телефоне, то напиши мне ${settings.SUPPORT_NAME}</i>
     `, {
@@ -274,14 +274,14 @@ export const hearsMacOC = async (ctx: Context) => {
     await ctx.reply('<b>Шаг 1.</b> Скопируйте через долгое нажатие или просто нажмите на сообщение выше 👆', {
       parse_mode: "HTML"
     })
-    await ctx.reply('<b>Шаг 2.</b> Установите приложение FoXray из AppStore 👉 https://apps.apple.com/ru/app/foxray/id6448898396?platform=mac', {
+    await ctx.reply('<b>Шаг 2.</b> Установите приложение v2RayTun из AppStore 👉 https://apps.apple.com/ru/app/v2raytun/id6476628951', {
       parse_mode: 'HTML',
       link_preview_options: { is_disabled: true }
     })
-    await ctx.reply('<b>Шаг 3.</b> Откройте приложение и нажмите на иконку 📋и разрешите вставку из приложения Telegram', {
+    await ctx.reply('<b>Шаг 3.</b> В приложении v2RayTun на главном экране нажать на + в правом верхнем углу, затем на "Добавить из буфера обмена"/"Import config from clipboard"', {
       parse_mode: 'HTML'
     })
-    await ctx.reply('<b>Шаг 4.</b> Нажмите на ▷ напротив появившегося тунеля для VPN', {
+    await ctx.reply('<b>Шаг 4.</b> Нажмите  на большую кнопку на главном экране!', {
       parse_mode: 'HTML'
     })
     await ctx.reply('🎉VPN настроен и готов к использованию. Спасибо что выбрали <b>VPNinja</b> ❤️', {
